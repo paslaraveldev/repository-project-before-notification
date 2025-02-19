@@ -3,157 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUST Research Repository</title>
+    <title>Research Repository - Guest Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('background.jpg');
-            background-size: cover;
-            color: #333;
             margin: 0;
             padding: 0;
-        }
-        .navbar {
-            background: yellowgreen;
-            padding: 15px;
+            background-color: #f4f4f4;
             text-align: center;
         }
-        .navbar ul {
-            list-style: none;
-            padding: 0;
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
         }
-        .navbar ul li {
-            display: inline;
-            margin: 0 15px;
-        }
-        .navbar ul li a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-        }
-        .hero {
-            text-align: center;
-            padding: 50px;
-            background: rgba(255, 255, 0, 0.7);
-        }
-        .search-sort {
-            text-align: center;
-            margin: 20px;
-        }
-        .projects-list, .latest-projects, .supervisors-carousel {
-            margin: 20px;
+        header {
+            background: #004080;
+            color: #fff;
             padding: 20px;
-            background: rgba(0, 128, 255, 0.8);
-            color: white;
-            border-radius: 10px;
+            text-align: center;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+        .search-bar {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .project-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .project-card {
-            background: white;
-            color: black;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .carousel {
-            display: flex;
-            overflow: auto;
-        }
-        .supervisor {
+            background: #fff;
+            padding: 15px;
             margin: 10px;
-            text-align: center;
+            width: 300px;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            text-align: left;
         }
-        .supervisor img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
         }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background: green;
-            color: white;
+        .btn.disabled {
+            background: #ccc;
         }
     </style>
 </head>
 <body>
-    <header class="navbar">
-        <h1>Mbarara University Research Repository</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Programs</a></li>
-                <li><a href="#">Projects</a></li>
-                <li><a href="#">Proposals</a></li>
-                <li><a href="#">Login</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <section class="hero">
-        <h2>Empowering Innovation Through Research</h2>
-        <p>Explore groundbreaking projects and contribute to the future of science and technology.</p>
-    </section>
-    
-    <section class="search-sort">
-        <input type="text" placeholder="Search projects by title...">
-        <div class="sort-options">
-            <h3>Sort By:</h3>
-            <ul>
-                <li><a href="#">Date of Issue</a></li>
-                <li><a href="#">Project Type</a></li>
-                <li><a href="#">Authors</a></li>
-                <li><a href="#">Courses</a></li>
-            </ul>
+
+<header>
+    <h1>Welcome to the Research Repository</h1>
+    <p>Browse academic research projects</p>
+</header>
+
+<div class="container">
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" placeholder="Search projects by title, author, or keywords...">
+    </div>
+
+    <!-- Project Listings -->
+    <div class="project-list">
+        <div class="project-card">
+            <h3>AI-Based Smart Irrigation System</h3>
+            <p><strong>Author:</strong> John Doe</p>
+            <p><strong>Supervisor:</strong> Dr. Smith</p>
+            <p><strong>Year:</strong> 2024</p>
+            <a href="#" class="btn disabled">Login to View</a>
         </div>
-    </section>
-    
-    <section class="projects-list">
-        <h3>Public Research Projects</h3>
-        <div class="projects">
-            <article>
-                <h4>Project Title</h4>
-                <p>Abstract summary goes here...</p>
-                <button onclick="promptLogin()">Read More</button>
-            </article>
+
+        <div class="project-card">
+            <h3>Blockchain for Secure Voting</h3>
+            <p><strong>Author:</strong> Jane Doe</p>
+            <p><strong>Supervisor:</strong> Prof. Brown</p>
+            <p><strong>Year:</strong> 2023</p>
+            <a href="#" class="btn disabled">Login to View</a>
         </div>
-    </section>
-    
-    <section class="latest-projects">
-        <h3>Latest Ready for Submission Reports</h3>
-        <div class="grid">
-            <div class="project-card">Title - Description <button onclick="promptLogin()">Read More</button></div>
-            <div class="project-card">Title - Description <button onclick="promptLogin()">Read More</button></div>
-            <div class="project-card">Title - Description <button onclick="promptLogin()">Read More</button></div>
-            <div class="project-card">Title - Description <button onclick="promptLogin()">Read More</button></div>
-            <div class="project-card">Title - Description <button onclick="promptLogin()">Read More</button></div>
-            <div class="project-card">Title - Description <button onclick="promptLogin()">Read More</button></div>
+
+        <div class="project-card">
+            <h3>Machine Learning in Healthcare</h3>
+            <p><strong>Author:</strong> Alice Smith</p>
+            <p><strong>Supervisor:</strong> Dr. Johnson</p>
+            <p><strong>Year:</strong> 2022</p>
+            <a href="#" class="btn disabled">Login to View</a>
         </div>
-    </section>
-    
-    <section class="supervisors-carousel">
-        <h3>Lead Supervisors</h3>
-        <div class="carousel">
-            <div class="supervisor">Supervisor Name <img src="supervisor1.jpg"></div>
-            <div class="supervisor">Supervisor Name <img src="supervisor2.jpg"></div>
-            <div class="supervisor">Supervisor Name <img src="supervisor3.jpg"></div>
-            <div class="supervisor">Supervisor Name <img src="supervisor4.jpg"></div>
-        </div>
-    </section>
-    
-    <footer>
-        <p>Important Links | Contact Us | Terms of Use</p>
-    </footer>
-    
-    <script>
-        function promptLogin() {
-            alert("Please log in to view this project.");
-        }
-    </script>
+    </div>
+
+    <p><a href="login.html" class="btn">Login for Full Access</a></p>
+</div>
+
 </body>
 </html>
