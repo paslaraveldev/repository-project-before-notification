@@ -11,15 +11,17 @@ use App\Mail\SupervisorCommentNotification;
 use Illuminate\Support\Facades\Mail;
 
 class SupervisorReportController extends Controller
-{ /**
+{ 
+
+     /**
      * Display all project reports for groups assigned to the supervisor.
      */
-     public function index()
+    public function index()
     {
         $supervisor = Auth::user();
         $groups = Group::where('supervisor_id', $supervisor->id)->with('reports')->get();
         $reports = $groups->flatMap->reports;
-        
+
         return view('Supervisorfiles.projectreport.index', compact('reports'));
     }
 
@@ -37,101 +39,89 @@ class SupervisorReportController extends Controller
     }
 
     /**
-     * Download the project report PDF securely.
+     * Download the project report PDF securely (Uploaded by students).
      */
-    public function downloadStudentPdf($id)
-        {
-            $supervisor = Auth::user();
-            $report = Report::whereHas('group', function ($query) use ($supervisor) {
-                $query->where('supervisor_id', $supervisor->id);
-            })->findOrFail($id);
+  public function downloadStudentPdf($id)
+{
+    $supervisor = Auth::user();
+    $report = Report::whereHas('group', function ($query) use ($supervisor) {
+        $query->where('supervisor_id', $supervisor->id);
+    })->findOrFail($id);
 
-            if (!$report->pdf_file || !Storage::exists($report->pdf_file)) {
-                return redirect()->back()->with('error', 'Report file not found.');
-            }
-
-            return response()->download(storage_path('app/' . $report->pdf_file));
-        }
-
-    /**
-     * Upload a new version of the project report PDF securely.
-     */
-    public function upload(Request $request, $id)
-    {
-        $supervisor = Auth::user();
-        $report = Report::whereHas('group', fn($q) => $q->where('supervisor_id', $supervisor->id))
-                        ->findOrFail($id);
-
-        $request->validate(['pdf' => 'required|mimes:pdf|max:20480']);
-
-        $file = $request->file('pdf');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs('reports', $fileName, 'local');
-        
-        $report->update(['pdf_file' => $filePath]);
-
-        return redirect()->back()->with('success', 'Report uploaded successfully.');
+    // Check if the PDF file exists and is accessible
+    $pdfFilePath = public_path($report->pdf_file);
+    if (!$report->pdf_file || !file_exists($pdfFilePath)) {
+        return redirect()->back()->with('error', 'Report file not found.');
     }
 
-    /**
-     * Review and comment on a project report.
-     */
+    return response()->download($pdfFilePath);
+}
+
     public function review(Request $request, $id)
-    {
-        $supervisor = Auth::user();
-        $report = Report::whereHas('group', fn($q) => $q->where('supervisor_id', $supervisor->id))
-                        ->findOrFail($id);
-
-        $request->validate(['status' => 'required|in:Draft,Ready for Submission', 'supervisor_comments' => 'required|string']);
-
-        $comment = ReportComment::create(['report_id' => $report->id, 'supervisor_id' => $supervisor->id, 'comment' => $request->supervisor_comments]);
-        $report->update(['status' => $request->status]);
-
-        foreach ($report->group->students as $student) {
-            Mail::to($student->email)->send(new SupervisorCommentNotification($report, $comment));
-        }
-
-        return redirect()->route('supervisor.reports.index')->with('success', 'Project reviewed and students notified.');
-    }
-
-    /**
-     * Upload a review PDF securely.
-     */
-   public function uploadReviewPdf(Request $request, $id)
 {
     $report = Report::findOrFail($id);
-    
-    $request->validate([
-        'review_pdf' => 'required|mimes:pdf|max:2048',
-    ]);
 
-    if ($request->hasFile('review_pdf')) {
-        $file = $request->file('review_pdf');
-        $filename = 'review_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('supervisor_reviews', $filename);
+    // Add supervisor comment
+    if ($request->has('supervisor_comments')) {
+        ReportComment::create([
+            'report_id' => $report->id,
+            'supervisor_id' => auth()->user()->id,
+            'comment' => $request->supervisor_comments,
+        ]);
+    }
 
-        $report->review_pdf = $path;
+    // Update report status
+    if ($request->has('status')) {
+        $report->status = $request->status;
         $report->save();
     }
 
-    return redirect()->back()->with('success', 'Review PDF uploaded successfully.');
+    return redirect()->route('supervisor.reports.show', $id)
+                     ->with('success', 'Review submitted successfully.');
 }
 
-
     /**
-     * Download a review PDF securely.
+     * Upload a reviewed project report PDF securely.
      */
-    public function downloadReviewPdf($id)
-    {
-        $user = Auth::user();
-        $report = Report::findOrFail($id);
-        $group = Group::findOrFail($report->group_id);
 
-        if ($group->supervisor_id !== $user->id && !$group->students->contains('id', $user->id)) {
-            abort(403, 'Unauthorized access');
+    public function uploadReviewPdf(Request $request, $id)
+    {
+        $supervisor = Auth::user();
+        $report = Report::whereHas('group', fn($q) => $q->where('supervisor_id', $supervisor->id))
+                        ->findOrFail($id);
+
+        $request->validate([
+            'review_pdf' => 'required|mimes:pdf|max:20480',
+        ]);
+
+        if ($request->hasFile('review_pdf')) {
+            $file = $request->file('review_pdf');
+            $fileName = 'review_' . time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('supervisor_reviews', $fileName, 'local');
+
+            $report->update(['review_pdf' => $filePath]);
         }
 
-        return Storage::download($report->review_pdf);
+        return redirect()->back()->with('success', 'Review PDF uploaded successfully.');
     }
 
+    /**
+     * Download the reviewed project report PDF securely (Uploaded by supervisor).
+     */
+public function downloadReviewPdf($id)
+{
+    $user = Auth::user();
+    $report = Report::findOrFail($id);
+    $group = Group::findOrFail($report->group_id);
+
+    if ($group->supervisor_id !== $user->id && !$group->students->contains('id', $user->id)) {
+        abort(403, 'Unauthorized access');
+    }
+
+    if (!$report->review_pdf || !Storage::exists($report->review_pdf)) {
+        return redirect()->back()->with('error', 'Review file not found.');
+    }
+
+    return Storage::download($report->review_pdf);
+}
 }

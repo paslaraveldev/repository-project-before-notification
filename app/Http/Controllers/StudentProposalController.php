@@ -88,17 +88,34 @@ public function download($id)
     $user = Auth::user();
     $group = $user->groups()->first();
 
-    // Ensure only the group that submitted the proposal can download the reviewed PDF
+    // Ensure the student is part of the group that owns the proposal
     if (!$group || $group->id !== $proposal->group_id) {
         return redirect()->back()->with('error', 'Unauthorized access.');
     }
 
-    // Check if the reviewed PDF exists and allow only the respective group to download it
+    // Check if the reviewed PDF exists before downloading
     if ($proposal->reviewed_pdf_path && Storage::disk('public')->exists($proposal->reviewed_pdf_path)) {
         return response()->download(storage_path('app/public/' . $proposal->reviewed_pdf_path));
     }
 
     return redirect()->back()->with('error', 'No reviewed PDF available for download.');
+}
+
+public function show($id)
+{
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'You need to log in to view this proposal.');
+    }
+
+    $proposal = Proposal::with('group.students')->findOrFail($id);
+    $user = Auth::user();
+    $group = $user->groups()->first();
+
+    if (!$group || $group->id !== $proposal->group_id) {
+        return redirect()->back()->with('error', 'Unauthorized access.');
+    }
+
+    return view('Studentfiles.proposals.show', compact('proposal'));
 }
 
 

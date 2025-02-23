@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class StudentProfileController extends Controller
 {
-    /**
+     /**
      * Show the profile of the logged-in student.
      *
      * @return \Illuminate\View\View

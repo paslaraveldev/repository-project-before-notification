@@ -21,6 +21,12 @@ use App\Http\Controllers\AdminApprovedReportController;
 use App\Http\Controllers\AdminSortingController;
 use App\Http\Controllers\StudentReportController;
 
+use App\Http\Controllers\GuestController;
+use App\Http\Controllers\SupervisorProfileController;
+use App\Http\Controllers\AboutUsController;
+
+
+
 
 
 
@@ -52,7 +58,7 @@ use App\Http\Controllers\StudentReportController;
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/guest', [HomeController::class, 'index']);
 // registration
 Route::get('registration', [AuthController::class, 'register']);
 Route::post('register', [AuthController::class, 'storeRegister'])->name('register.user');
@@ -185,10 +191,8 @@ Route::resource('project_types', ProjectTypeController::class);
 
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('profile', [UserProfileController::class, 'index'])->name('user.profile');
-    Route::post('profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
-});
+
+
 
 
 
@@ -215,7 +219,10 @@ Route::middleware(['auth', 'student'])->group(function () {
 Route::get('/proposals', [StudentProposalController::class, 'index'])->name('proposals.index');
 Route::get('/proposals/create', [StudentProposalController::class, 'create'])->name('proposals.create');
 Route::post('/proposals', [StudentProposalController::class, 'store'])->name('proposals.store');
-Route::get('/proposals/download/{id}', [StudentProposalController::class, 'download'])->name('proposals.download');
+
+Route::get('/proposals/{id}', [StudentProposalController::class, 'show'])->name('proposals.show');
+Route::get('/proposals/{id}/download', [StudentProposalController::class, 'download'])->name('proposals.download');
+
 
 Route::get('/proposals/edit/{id}', [StudentProposalController::class, 'edit'])->name('proposals.edit');
 Route::put('/proposals/modify/{id}', [StudentProposalController::class, 'modify'])->name('proposals.modify');
@@ -224,22 +231,16 @@ Route::put('/proposals/modify/{id}', [StudentProposalController::class, 'modify'
 
 
 // student reports
-
-
-// Student Project Report Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'student'])->group(function () {
     Route::get('/studentreports/create', [StudentReportController::class, 'create'])->name('studentreports.create');
     Route::post('/studentreports', [StudentReportController::class, 'store'])->name('studentreports.store');
     Route::get('/studentreports', [StudentReportController::class, 'index'])->name('studentreports.index');
-
-    Route::get('/student/reports/download/{id}', [StudentReportController::class, 'download'])->name('student.reports.download');
-    
     Route::get('/studentreports/modify/{id}', [StudentReportController::class, 'modify'])->name('studentreports.modify');
     Route::put('/studentreports/update/{id}', [StudentReportController::class, 'update'])->name('studentreports.update');
-
-    // Allow students to download supervisor-uploaded review PDFs
-    Route::get('/student/reports/download-review/{id}', [StudentReportController::class, 'downloadSupervisorPdf'])
-        ->name('student.reports.downloadSupervisorPdf');
+    Route::get('/studentreports/{report}', [StudentReportController::class, 'show'])->name('report.show');
+    Route::get('/student/reports/download/{id}', [StudentReportController::class, 'download'])->name('student.reports.download');
+    Route::get('/student/reports/download-review/{id}', [StudentReportController::class, 'downloadReviewedReport'])->name('student.reports.downloadReviewPdf');
+    Route::post('/student/reports/upload', [StudentReportController::class, 'uploadReport'])->name('student.reports.upload');
 });
 
 
@@ -284,11 +285,29 @@ Route::middleware(['auth', 'supervisor'])->group(function () {
     // Allow supervisors to download students' report PDFs
     Route::get('/supervisor/reports/{id}/download-student-pdf', [SupervisorReportController::class, 'downloadStudentPdf'])
         ->name('supervisor.reports.downloadStudentPdf');
+
+
+
+            
+    Route::get('/supervisor/reports/{id}/download', [SupervisorReportController::class, 'downloadStudentPdf'])->name('supervisor.reports.download');
+    Route::post('/supervisor/reports/{id}/upload-review', [SupervisorReportController::class, 'uploadReviewPdf'])->name('supervisor.reports.uploadReview');
+    Route::get('/supervisor/reports/{id}/download-review', [SupervisorReportController::class, 'downloadReviewPdf'])->name('supervisor.reports.downloadReview');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/supervisor/profile', [SupervisorProfileController::class, 'show'])->name('profile.show');
+
+    Route::get('/supervisor/profile/edit', [SupervisorProfileController::class, 'edit'])->name('userprofile.edit');
+    Route::post('/supervisor/profile/update', [SupervisorProfileController::class, 'update'])->name('userprofile.update');
 });
 
 
 
+// web routes
 
+Route::get('/', [GuestController::class, 'index'])->name('guest.index');
+
+Route::resource('about', AboutUsController::class);
 
 
 

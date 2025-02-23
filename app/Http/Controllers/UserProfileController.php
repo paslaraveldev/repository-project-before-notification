@@ -9,37 +9,50 @@ use Illuminate\Support\Facades\Auth;
 class UserProfileController extends Controller
 {
     
-    // Display the profile of the currently logged-in user
-    public function index()
+    /**
+     * Show the profile of the logged-in user.
+     */
+    public function show()
     {
-        $user = Auth::user(); // Get the currently logged-in user
-        return view('profile.show', compact('user')); // Display the profile view
+        $user = Auth::user();
+        return view('profile.show', compact('user'));
     }
 
-    // Update the profile of the currently logged-in user
+    /**
+     * Show the profile settings page.
+     */
+    public function edit()
+    {
+        $user = Auth::user();
+        return view('profile.settings', compact('user'));
+    }
+
+    /**
+     * Update the user's profile information.
+     */
     public function update(Request $request)
     {
-        $user = Auth::user(); // Get the currently logged-in user
-
-        // Validate the incoming data
-        $validatedData = $request->validate([
+        // Validate input
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'image' => 'nullable|image|max:8192', // Valid image up to 8MB
+            'email' => 'required|string|email|max:255',
+            'image' => 'nullable|image|max:8192', // Allow images up to 8MB
         ]);
 
-        // Handle image upload if a file is provided
+        // Get logged-in user
+        $user = Auth::user();
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        // Handle image upload
         if ($request->hasFile('image')) {
-            // Generate a unique name for the image and store it
-            $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
-            $request->file('image')->move(public_path('images/users'), $imageName);
-            $validatedData['image'] = $imageName;
+            $filename = 'user_image_' . time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move(public_path('assets/images/users'), $filename);
+            $user->image = $filename;
         }
 
-        // Update the user profile with validated data
-        $user->update($validatedData);
+        $user->save();
 
-        // Redirect back to the profile with a success message
-        return redirect()->route('user.profile')->with('success', 'Profile updated successfully!');
+        return redirect()->route('userprofile.show')->with('success', 'Profile updated successfully');
     }
 }

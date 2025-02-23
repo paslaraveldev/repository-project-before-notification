@@ -14,18 +14,20 @@
 
             <div class="mb-4">
                 <strong>PDF:</strong>
-                <a href="{{ route('supervisor.proposals.download', $proposal->id) }}" class="btn btn-success">Download</a>
+                <a href="{{ route('supervisor.proposals.download', $proposal->id) }}" class="btn btn-success">Students' Proposal Download</a>
             </div>
 
+            {{-- Upload reviewed proposal --}}
             <form action="{{ route('supervisor.proposals.upload', $proposal->id) }}" method="POST" enctype="multipart/form-data" class="mt-3">
                 @csrf
                 <div class="mb-3">
                     <label for="pdf" class="form-label">Upload Updated PDF</label>
-                    <input type="file" name="reviewed_pdf_path" id="pdf" class="form-control" required>
+                    <input type="file" name="pdf" id="pdf" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-warning">Upload</button>
             </form>
 
+            {{-- Review Proposal --}}
             <form action="{{ route('supervisor.proposals.review', $proposal->id) }}" method="POST" class="mt-3">
                 @csrf
                 <div class="mb-3">
@@ -42,7 +44,7 @@
                 <button type="submit" class="btn btn-primary">Submit Review</button>
             </form>
 
-            <!-- Display Previous Comments -->
+            {{-- Display Previous Comments --}}
             <div class="mt-4">
                 <h5>Previous Comments</h5>
                 @forelse($proposal->comments as $comment)

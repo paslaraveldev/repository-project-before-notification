@@ -45,8 +45,16 @@
                                 View Comments ({{ $proposal->comments->count() }})
                             </button>
 
-                             <a href="{{ route('proposals.download', $proposal->id) }}" class="btn btn-sm btn-primary">  Download Supervisor’s PDF
-                            </a>
+                             <td>
+                                @if($proposal->reviewed_pdf_path)
+                                    <a href="{{ route('proposals.download', $proposal->id) }}" class="btn btn-sm btn-primary">
+                                        Download Supervisor’s PDF
+                                    </a>
+                                @else
+                                    <span class="text-muted">No reviewed PDF available</span>
+                                @endif
+                            </td>
+
 
 
                             <a href="{{ route('proposals.edit', $proposal->id) }}" class="btn btn-sm btn-warning">Modify</a>

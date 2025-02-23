@@ -210,46 +210,62 @@ F<!DOCTYPE html>
 <li class="nav-item dropdown pe-3">
     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
         <!-- Display user profile image or default image if not set -->
-        <img src="{{ Auth::user()->image ? asset('Assetsz/images/myimages/' . Auth::user()->image) : asset('Assetsz/img/default-profile.jpg') }}" alt="Profile" class="rounded-circle">
+        <img src="{{ Auth::user()->image ? asset('assets/images/users/' . Auth::user()->image) : asset('assets/img/default-profile.jpg') }}" 
+             alt="Profile" 
+             class="rounded-circle" 
+             width="40" height="40">
         <span class="d-none d-md-block dropdown-toggle ps-2">
             {{ Auth::user()->name ?? 'Guest' }}
         </span>
     </a><!-- End Profile Image Icon -->
 
     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-    <li class="dropdown-header text-center">
-        <img src="{{ Auth::user()->profile_image ?? asset('default-profile.png') }}" 
-             alt="Profile Image" 
-             class="rounded-circle img-fluid" 
-             width="80" height="80"> <!-- Adjust size as needed -->
-        <h6 class="mt-2">{{ Auth::user()->name }}</h6>
-        <span>{{ Auth::user()->course ?? 'N/A' }}</span>
-    </li>
-    <li><hr class="dropdown-divider"></li>
+        <li class="dropdown-header text-center">
+            <img src="{{ Auth::user()->image ? asset('assets/images/users/' . Auth::user()->image) : asset('assets/img/default-profile.jpg') }}" 
+                 alt="Profile Image" 
+                 class="rounded-circle img-fluid" 
+                 width="80" height="80">
+            <h6 class="mt-2">{{ Auth::user()->name }}</h6>
+            <span>
+                @if(Auth::user()->role == 'student')
+                    {{ Auth::user()->course->name ?? 'N/A' }}
+                @elseif(Auth::user()->role == 'supervisor')
+                    {{ Auth::user()->department->name ?? 'Supervisor' }}
+                @else
+                    {{ ucfirst(Auth::user()->role) }}
+                @endif
+            </span>
+        </li>
+        <li><hr class="dropdown-divider"></li>
 
-    <li>
-        <a class="dropdown-item d-flex align-items-center" href="{{ route('studentprofile.show') }}">
-            <i class="bi bi-person"></i>
-            <span>My Profile</span>
-        </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item d-flex align-items-center" href="{{ route('profile.show') }}">
+                <i class="bi bi-person"></i>
+                <span>My Profile</span>
+            </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
 
-    <li>
-        <a class="dropdown-item d-flex align-items-center" href="{{ route('studentprofile.settings') }}">
-            <i class="bi bi-gear"></i>
-            <span>Account Settings</span>
-        </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item d-flex align-items-center" href="{{ route('userprofile.edit') }}">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+            </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
 
-    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-        @csrf
-        <button type="submit" class="btn btn-secondary">Logout</button>
-    </form>
-</ul>
-<!-- End Profile Dropdown Items -->
+        <li>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="dropdown-item d-flex align-items-center">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
+        </li>
+    </ul><!-- End Profile Dropdown Items -->
 </li>
+
 
       </ul>
     </nav><!-- End Icons Navigation -->

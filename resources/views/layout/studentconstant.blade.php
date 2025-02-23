@@ -210,46 +210,72 @@ F<!DOCTYPE html>
 <li class="nav-item dropdown pe-3">
     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
         <!-- Display user profile image or default image if not set -->
-        <img src="{{ Auth::user()->image ? asset('assets/images/myimages/' . Auth::user()->image) : asset('assets/img/default-profile.jpg') }}" alt="Profile" class="rounded-circle">
+        <img src="{{ auth()->check() && Auth::user()->image ? asset('assets/images/myimages/' . Auth::user()->image) : asset('assets/img/default-profile.jpg') }}" 
+             alt="Profile" class="rounded-circle">
+
         <span class="d-none d-md-block dropdown-toggle ps-2">
-            {{ Auth::user()->name ?? 'Guest' }}
+            {{ auth()->check() ? Auth::user()->name : 'Guest' }}
         </span>
     </a><!-- End Profile Image Icon -->
 
     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-    <li class="dropdown-header text-center">
-        <img src="{{ Auth::user()->profile_image ?? asset('default-profile.png') }}" 
-             alt="Profile Image" 
-             class="rounded-circle img-fluid" 
-             width="80" height="80"> <!-- Adjust size as needed -->
-        <h6 class="mt-2">{{ Auth::user()->name }}</h6>
-        <span>{{ Auth::user()->course ?? 'N/A' }}</span>
-    </li>
-    <li><hr class="dropdown-divider"></li>
+        @auth
+            <!-- Display user details for logged-in users -->
+            <li class="dropdown-header text-center">
+                <img src="{{ Auth::user()->profile_image ? asset('assets/images/myimages/' . Auth::user()->profile_image) : asset('assets/img/default-profile.jpg') }}" 
+                     alt="Profile Image" 
+                     class="rounded-circle img-fluid" 
+                     width="80" height="80"> <!-- Adjust size as needed -->
+                <h6 class="mt-2">{{ Auth::user()->name }}</h6>
+                <span>{{ Auth::user()->course ?? 'N/A' }}</span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
 
-    <li>
-        <a class="dropdown-item d-flex align-items-center" href="{{ route('studentprofile.show') }}">
-            <i class="bi bi-person"></i>
-            <span>My Profile</span>
-        </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{{ route('studentprofile.show') }}">
+                    <i class="bi bi-person"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
 
-    <li>
-        <a class="dropdown-item d-flex align-items-center" href="{{ route('studentprofile.settings') }}">
-            <i class="bi bi-gear"></i>
-            <span>Account Settings</span>
-        </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{{ route('studentprofile.settings') }}">
+                    <i class="bi bi-gear"></i>
+                    <span>Account Settings</span>
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
 
-    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-        @csrf
-        <button type="submit" class="btn btn-secondary">Logout</button>
-    </form>
-</ul>
-<!-- End Profile Dropdown Items -->
+            <li>
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary w-100">Logout</button>
+                </form>
+            </li>
+        @else
+            <!-- Display login option for guests -->
+            <li class="dropdown-header text-center">
+                <img src="{{ asset('assets/img/default-profile.jpg') }}" 
+                     alt="Profile Image" 
+                     class="rounded-circle img-fluid" 
+                     width="80" height="80">
+                <h6 class="mt-2">Guest</h6>
+                <span>Not logged in</span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="/login">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Login</span>
+                </a>
+            </li>
+        @endauth
+    </ul>
+    <!-- End Profile Dropdown Items -->
 </li>
+
 
       </ul>
     </nav><!-- End Icons Navigation -->

@@ -27,8 +27,7 @@
                         <td>{{ $report->title }}</td>
                         <td>{{ $report->group->name }}</td>
                         <td>
-                            <span class="badge 
-                                {{ $report->status == 'Draft' ? 'bg-warning' : 'bg-success' }}">
+                            <span class="badge {{ $report->status == 'Draft' ? 'bg-warning' : 'bg-success' }}">
                                 {{ $report->status }}
                             </span>
                         </td>
@@ -44,8 +43,10 @@
                         </td>
                         <td>
                             <a href="{{ route('supervisor.reports.show', $report->id) }}" class="btn btn-primary btn-sm">View</a>
-                           <a href="{{ route('supervisor.reports.downloadStudentPdf', $report->id) }}" class="btn btn-success btn-sm">Download Student Report</a>
-
+                            <a href="{{ route('supervisor.reports.downloadStudentPdf', $report->id) }}" class="btn btn-success btn-sm">Download Student Report</a>
+                            @if($report->review_pdf)
+                                <a href="{{ route('supervisor.reports.downloadReviewPdf', $report->id) }}" class="btn btn-info btn-sm">Download Review PDF</a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
